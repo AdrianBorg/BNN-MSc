@@ -14,6 +14,7 @@ program testfunctions
     call testdense()
     call testload()
     !call testload1()
+    call testReader()
 
 end program testfunctions
 
@@ -281,6 +282,11 @@ subroutine testload()
 
     call loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t5, t6, t7, t8)
 
-    call printmat(w1(1,1,:,:), [3, 3])
+    !call printmat(w1(1,1,:,:), [3, 3])
 
 end subroutine testload
+
+subroutine testReader()
+    integer(2) imgs(10000,3,32,32), labels(10000)
+    call cifarFileReader(imgs, labels)
+end subroutine testReader

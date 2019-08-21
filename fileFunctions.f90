@@ -8,7 +8,7 @@ subroutine testfileloading()
 
     do i = 1, f*f
         read(10, IOSTAT=iostatus) j
-        print *, iostatus, j
+        !print *, iostatus, j
     end do
 
 end subroutine testfileloading
@@ -33,8 +33,8 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
         write(fileNum, '(I1)') k-1
         filenameW = 'weightsLayer'//fileNum
         filenameT = 'treshsLayer'//fileNum
-        open(unit=10, file=filenameW, access='STREAM', form='unformatted')
-        open(unit=25, file=filenameT, access='STREAM', form='unformatted')
+        open(unit=10, file=filenameW, access='STREAM', status='old', form='unformatted')
+        open(unit=25, file=filenameT, access='STREAM', status='old', form='unformatted')
         do o = 1, chOut(k)
             !read weights
             if (k < 7) then     !for each conv layer
@@ -96,23 +96,31 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
 
 end subroutine loadData
 
-subroutine cifarReader(imgs)
-    integer(1) label, zero2, dtype, ndims
-    integer nr, pixel, colour, row, col
+subroutine cifarFileReader(imgs_unsigned, label)
+    integer, parameter :: npics = 10000, dims = 32
+    integer(1) label(npics) !, zero2, dtype, ndims
+    integer nr, py, px, colour, row, col
     ! These are signed bytes, so between -128 and 127
-    integer(1) imgs(1024,3,10000)
+    integer(1) imgs(npics,3,dims,dims)
     ! imgs_unsigned(i,j,k) = imgs(i,j,k) +128
-    integer imgs_unsigned(1024,3,10000)
+    integer(2) imgs_unsigned(npics,3,dims,dims)
 
     label=42 ! should 0-9
 
-    open(unit=42,file="train-images-idx3-ubyte",access='STREAM')
+    open(unit=42,file="test_batch.bin",access='STREAM', status='old', form='unformatted')
 
-    do nr=1,10000
-        read(42) label
+    do nr=1,npics
+        read(42) label(nr)
         do colour=1,3
-            do pixel=1,1024
-                read(42) imgs(pixel,colour,nr)
+            do py=1,dims
+                do px=1,dims
+                    read(42) imgs(nr,colour,py,px)
+                    if (imgs(nr,colour,py,px) < 0) then
+                        imgs_unsigned(nr,colour,py,px) = imgs(nr,colour,py,px) + 256
+                    else
+                        imgs_unsigned(nr,colour,py,px) = imgs(nr,colour,py,px)
+                    end if
+                end do
             end do
         end do
     end do
@@ -121,9 +129,11 @@ subroutine cifarReader(imgs)
 
 
     do nr=1,10
+        print *, label(nr)
         do row=1,32
-            print *, (imgs((row-1)*32+col,1,nr),col=1,32) ! colour channel 1
+            !print *, (imgs((row-1)*32+col,1,nr),col=1,32) ! colour channel 1
+            print *, (imgs_unsigned(nr,3,row,col),col=1,32) ! colour channel 1
         end do
     end do
 
-end subroutine cifarReader
+end subroutine cifarFileReader
