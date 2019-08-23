@@ -296,7 +296,7 @@ end subroutine testdensebin
 
 subroutine testconv2dbin()
     integer, parameter :: chOut = 1, chIn = 1, W = 3, H = 3, fn = 2, fm = 2, stride = 1
-    integer a(chIn, H, W), bias(chOut), fil(chOut, chIn, fn, fm), res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
+    integer a(chIn, H, W), fil(chOut, chIn, fn, fm), res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer expected(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer t(2,2)
 
@@ -304,9 +304,8 @@ subroutine testconv2dbin()
     t = reshape([ 0, 1, 1, 1], [fn,fm])
     fil(1, 1, :, :) = t
     expected = reshape([ 2, 1, 3, 1], shape(expected))
-    bias = [0]
 
-    call conv2dbin(res, a, chOut, chIn, W, H, bias, fil, fn, fm, stride)
+    call conv2dbin(res, a, chOut, chIn, W, H, fil, fn, fm, stride)
     call testequalintegermat(res, expected, shape(res), shape(expected), 3, 'conv2dbin')
 
 end subroutine testconv2dbin

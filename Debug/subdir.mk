@@ -9,11 +9,14 @@ F90_SRCS += \
 ../layerFunctions.f90 \
 ../matrixFunctions.f90 \
 ../run.f90 \
+../test.f90 \
 ../testfunctions.f90 \
 ../timing.f90 
 
 O_SRCS += \
 ../CNV.o \
+../MiscLayerFunctions.o \
+../MiscMatrixFunctions.o \
 ../fileFunctions.o \
 ../layerFunctions.o \
 ../matrixFunctions.o \
@@ -26,6 +29,7 @@ OBJS += \
 ./layerFunctions.o \
 ./matrixFunctions.o \
 ./run.o \
+./test.o \
 ./testfunctions.o \
 ./timing.o 
 
@@ -47,6 +51,8 @@ layerFunctions.o: ../layerFunctions.f90
 matrixFunctions.o: ../matrixFunctions.f90
 
 run.o: ../run.f90
+
+test.o: ../test.f90
 
 testfunctions.o: ../testfunctions.f90
 
