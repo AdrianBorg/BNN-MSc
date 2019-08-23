@@ -56,8 +56,10 @@
 !    print *, ''
 !    print *, '- Tests done! Starting program -'
 !    print *, ''
-!    call cifarFileReader(imgs, labels)
+!    call cifarFileReader1(imgs, labels)
 !    print *, '- Images   : loaded'
+!    call loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t5, t6, t7, t8)
+!    print *, '- Weights  : loaded'
 !
 !    do i = 0, 9
 !        stats(i) = 0
@@ -73,6 +75,8 @@
 !            print *, stats
 !        end if
 !    end do
+!
+!    call timingresults()
 !
 !    print *, 'stats: ', stats
 !    print *, 'correct: ', correct
@@ -124,6 +128,28 @@
 !
 !
 !end program testfunctions
+
+subroutine runtests()
+    call testmsum3d()
+    call testmmulargmax()
+    call testmaxpool()
+    call testhardtanh2d()
+    call testhardtanh3d()
+    call testhardtanh4d()
+    call testbatchnorm2d()
+    call testbatchnorm3d()
+    call testconv2d()
+    call testthresholdLayer()
+    call testdense()
+    call testsumpopcount()
+    call testxnor()
+    call testmmulbin()
+    call testdensebin()
+    call testconv2dbin()
+!    call testload() !something with this crashed at runtime
+!    call testReader()
+
+end subroutine runtests
 
 subroutine testmsum3d()
     integer, parameter :: n = 2, m = 2, k=2
@@ -402,7 +428,7 @@ end subroutine testload
 
 subroutine testReader()
     integer imgs(10000,3,32,32), labels(10000)
-    call cifarFileReader(imgs, labels)
+    call cifarFileReader1(imgs, labels)
     print *, '###############write test func - read'
 end subroutine testReader
 

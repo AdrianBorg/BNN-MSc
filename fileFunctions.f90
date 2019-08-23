@@ -36,7 +36,7 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
     character*1 fileNum
 
 
-
+    call timingstarts(8)
     do k = 1, 9
         write(fileNum, '(I1)') k-1
         filenameW = 'params/weightsLayer'//fileNum
@@ -110,20 +110,20 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
         close(10)
         close(25)
     end do
-
+    call timingend(8)
 end subroutine loadData
 
-subroutine cifarFileReader(imgs_unsigned, label)
+subroutine cifarFileReader1(imgs_unsigned, label)
     integer, parameter :: npics = 10000, dims = 32
     integer(1) label(npics) !, zero2, dtype, ndims
-    integer nr, py, px, colour, row, col
+    integer nr, py, px, colour!, row, col
     ! These are signed bytes, so between -128 and 127
     integer(1) imgs(npics,3,dims,dims)
     ! imgs_unsigned(i,j,k) = imgs(i,j,k) +128
     integer imgs_unsigned(npics,3,dims,dims)
 
-    label=42 ! should 0-9
-
+!    label=42 ! should 0-9
+    call timingstarts(7)
     open(unit=42,file="imgBins/test_batch.bin",access='STREAM', status='old', form='unformatted')
 
     do nr=1,npics
@@ -143,7 +143,7 @@ subroutine cifarFileReader(imgs_unsigned, label)
     end do
 
     close(42)
-
+    call timingend(7)
 !    do nr=1,1
 !        print *, label(nr)
 !        do row=1,32
@@ -152,4 +152,4 @@ subroutine cifarFileReader(imgs_unsigned, label)
 !        end do
 !    end do
 
-end subroutine cifarFileReader
+end subroutine cifarFileReader1

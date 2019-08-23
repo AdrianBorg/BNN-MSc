@@ -30,41 +30,44 @@ subroutine timingresults()
     integer counts(n)
 
     common /ts/ avtimings, counts
-
-    print *, 'Averages: ', avtimings
-    print *, 'Counts  : ', counts
+    print *, ''
+    print *, '- Timings -'
+    print '(10X, 8A12)', 'CNVconv', 'conv2dbin', 'maxpool', 'densebin', 'thresh Lay', 'infer', 'ld imgs', 'ld wts'
+    print '(A10, 8ES12.2)', 'Averages: ', avtimings
+    print '(A10, 8I12)', 'Counts  : ', counts
+    print *, ''
 
 end subroutine timingresults
 
 subroutine timingstarts(funct)
-!    real timstart, timend
-!    integer funct, f0
-!    logical started
-!
-!    common /tm/ timstart, timend, started, f0
-!
-!    if (started) then
-!        print *, 'Must call timingend before timingstart'
-!    end if
-!    f0 = funct
-!
-!    started = .true.
-!    call cpu_time(timstart)
+    integer, parameter :: n = 8
+    real timstart(n), timend(n)
+    integer funct
+    logical started(n)
+
+    common /tm/ timstart, timend, started
+
+    if (started(funct)) then
+        print *, 'Must call timingend before timingstart'
+    end if
+
+    started(funct) = .true.
+    call cpu_time(timstart(funct))
 end subroutine timingstarts
 
 subroutine timingend(funct)
-!    real timstart, timend
-!    integer funct, f0
-!    logical started
-!
-!    common /tm/ timstart, timend, started, f0
-!    if (.not.started) then
-!        print *, 'Must call timingstart before timingend'
-!    else if (funct /= f0) then
-!        print *, 'Function timing mismatch'
-!    end if
-!
-!    started = .false.
-!    call cpu_time(timend)
-!    call timing(timstart-timend, funct)
+    integer, parameter :: n = 8
+    real timstart(n), timend(n)
+    integer funct
+    logical started(n)
+
+    common /tm/ timstart, timend, started
+
+    if (.not.started(funct)) then
+        print *, 'Must call timingstart before timingend'
+    end if
+
+    started(funct) = .false.
+    call cpu_time(timend(funct))
+    call timing(timstart(funct)-timend(funct), funct)
 end subroutine timingend
