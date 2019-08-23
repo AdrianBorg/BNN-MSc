@@ -1,0 +1,94 @@
+C:\Users\borga\Documents\MEGA\MScProj\BNN-MSc>run.exe
+ --------------------
+
+ - Starting program -
+
+ - Images   : loaded
+ - Weights  : loaded
+ i =          100 | stats =            8           0           3           8           0           3          10           3          12           7
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     6.56E-03    1.86E-02    1.48E-03    7.81E-05    3.12E-05    1.03E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :          100         500         200         600        1000         100           1           1           0           0
+
+ i =         1000 | stats =           70          49          27          63          26          34          44          64          86          44
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     6.94E-03    1.92E-02    1.21E-03    1.04E-04    4.06E-05    1.06E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         1000        5000        2000        6000       10000        1000           1           1           0           0
+
+ i =         2000 | stats =          142         108          61         126          59          81          90         115         174          91
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.14E-03    1.97E-02    1.26E-03    1.16E-04    3.44E-05    1.09E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         2000       10000        4000       12000       20000        2000           1           1           0           0
+
+ i =         3000 | stats =          223         155         103         181          87         130         128         158         260         124
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.23E-03    2.07E-02    1.29E-03    1.35E-04    4.17E-05    1.15E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         3000       15000        6000       18000       30000        3000           1           1           0           0
+
+ i =         4000 | stats =          290         219         135         234         128         175         160         219         330         174
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.28E-03    2.13E-02    1.29E-03    1.34E-04    4.57E-05    1.18E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         4000       20000        8000       24000       40000        4000           1           1           0           0
+
+ i =         5000 | stats =          367         283         162         299         165         224         200         268         409         218
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.63E-03    2.15E-02    1.37E-03    1.35E-04    4.94E-05    1.19E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         5000       25000       10000       30000       50000        5000           1           1           0           0
+
+ i =         6000 | stats =          444         329         185         358         198         272         235         321         477         260
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.57E-03    2.18E-02    1.39E-03    1.38E-04    4.90E-05    1.21E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         6000       30000       12000       36000       60000        6000           1           1           0           0
+
+ i =         7000 | stats =          526         380         218         420         227         310         263         365         563         295
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.62E-03    2.20E-02    1.38E-03    1.32E-04    4.73E-05    1.21E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         7000       35000       14000       42000       70000        7000           1           1           0           0
+
+ i =         8000 | stats =          604         436         248         482         260         353         302         415         636         342
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.73E-03    2.21E-02    1.39E-03    1.32E-04    4.79E-05    1.22E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         8000       40000       16000       48000       80000        8000           1           1           0           0
+
+ i =         9000 | stats =          668         484         278         550         288         396         336         456         740         387
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.76E-03    2.22E-02    1.38E-03    1.33E-04    4.65E-05    1.23E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :         9000       45000       18000       54000       90000        9000           1           1           0           0
+
+ i =        10000 | stats =          747         532         306         595         319         443         368         510         825         433
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.78E-03    2.23E-02    1.39E-03    1.33E-04    4.66E-05    1.23E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :        10000       50000       20000       60000      100000       10000           1           1           0           0
+
+
+ - Timings -
+               CNVconv   conv2dbin     maxpool    densebin  thresh Lay       infer     ld imgs      ld wts     el xnor        msum
+Averages:     7.78E-03    2.23E-02    1.39E-03    1.33E-04    4.66E-05    1.23E-01    4.30E+00    2.03E-01    0.00E+00    0.00E+00
+Counts  :        10000       50000       20000       60000      100000       10000           1           1           0           0
+
+ - Results -
+              airplane         car        bird         cat        deer         dog        frog       horse        ship       truck
+   stats:          747         532         306         595         319         443         368         510         825         433
+ correct:         5078

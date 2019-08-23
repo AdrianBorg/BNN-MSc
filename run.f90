@@ -1,7 +1,7 @@
 program run
     implicit none
 
-    integer, parameter :: pics2run = 10
+    integer, parameter :: pics2run = 10000
     !testing batch variables
     integer, parameter :: npics = 10000, dims = 32, colours = 3
     integer imgs(npics, colours, dims, dims)
@@ -42,8 +42,13 @@ program run
             stats(result) = stats(result) + 1
             correct = correct + 1
         end if
+        if (i == 100) then
+            print *, 'i = ', i, '| stats = ', stats
+            call timingresults()
+        end if
         if (mod(i, 1000) == 0) then
             print *, 'i = ', i, '| stats = ', stats
+            call timingresults()
         end if
     end do
 

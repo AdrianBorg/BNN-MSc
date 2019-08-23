@@ -1,25 +1,3 @@
-subroutine msum3d(res, a, s)
-    !sums all values in a 3D matrix
-    !res - result of the usm
-    !a - input 2d matrix
-    !s - shape of a
-    integer, intent(in) :: s(3), a(s(1), s(2), s(3))
-    integer, intent(out) :: res
-    integer i, j, k
-
-    call timingstarts(10)
-    res = 0
-
-    do k = 1, s(3)
-        do j = 1, s(2)
-            do i = 1, s(1)
-                res = res + a(i, j, k)
-            end do
-        end do
-    end do
-    call timingend(10)
-end subroutine msum3d
-
 subroutine mmul(res, a, b, an, am, bn, bm)
     !performs the matrix multiplication of 2 matricies
     !res - ouput
@@ -343,16 +321,43 @@ subroutine elemwisexnor3d(res, a, b, l, n, m)
     integer, intent(out) :: res(l, n, m)
     integer i, j, k
 
-    call timingstarts(9)
-    do k = 1, l
+!    call timingstarts(9)
+    do i = 1, m
         do j = 1, n
-            do i = 1, m
-                call xnor(res(k, j, i), a(k, j, i), b(k, j, i))
+            do k = 1, l
+                !call xnor(res(k, j, i), a(k, j, i), b(k, j, i))
+                if (a(k, j, i) == b(k, j, i)) then
+                    res(k, j, i) = 1
+                else
+                    res(k, j, i) = 0
+                end if
             end do
         end do
     end do
-    call timingend(9)
+!    call timingend(9)
 end subroutine elemwisexnor3d
+
+subroutine msum3d(res, a, s)
+    !sums all values in a 3D matrix
+    !res - result of the usm
+    !a - input 2d matrix
+    !s - shape of a
+    integer, intent(in) :: s(3), a(s(1), s(2), s(3))
+    integer, intent(out) :: res
+    integer i, j, k
+
+!    call timingstarts(10)
+    res = 0
+
+    do k = 1, s(3)
+        do j = 1, s(2)
+            do i = 1, s(1)
+                res = res + a(i, j, k)
+            end do
+        end do
+    end do
+!    call timingend(10)
+end subroutine msum3d
 
 subroutine mmulbin(res, a, b, an, am, bn, bm)
     !performs the matrix multiplication of 2 binarized matricies

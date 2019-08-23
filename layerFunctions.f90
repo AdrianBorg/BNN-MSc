@@ -250,27 +250,161 @@ subroutine conv2dbin(res, a, chOut, chIn, W, H, fil, fn, fm, stride)
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer i, j, l, tempsum, filmult(chIn, fn, fm)
 
+    integer i2, j2, k2
+
     call timingstarts(2)
 
     res = res * 0
 
     do l = 1, chOut
-!        do k = 1, chIn
-            do j = 1, H-fn+1, stride
-                do i = 1, W-fm+1, stride
-                    call elemwisexnor3d(filmult, fil(l, :, :, :), a(:, j:j+fn-1, i:i+fm-1), chIn, fn, fm) !filter * receptive field
-                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
-!                    call sumPopcount(tempsum, filmult, shape(filmult))
-                    res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum
+        do j = 1, H-fn+1, stride
+            do i = 1, W-fm+1, stride
+!                    call elemwisexnor3d(filmult, fil(l, :, :, :), a(:, j:j+fn-1, i:i+fm-1), chIn, fn, fm) !filter * receptive field
+                do i2 = 1, fm
+                    do j2 = 1, fn
+                        do k2 = 1, chIn
+                            if (fil(l, k2, j2, i2) == a(k2, j+j2-1, i+i2-1)) then
+                                filmult(k2, j2, i2) = 1
+                            else
+                                filmult(k2, j2, i2) = 0
+                            end if
+                        end do
+                    end do
                 end do
+!                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+                tempsum = 0
+
+                do i2 = 1, fm
+                    do j2 = 1, fn
+                        do k2 = 1, chIn
+                            tempsum = tempsum + filmult(k2, j2, i2)
+                        end do
+                    end do
+                end do
+
+                res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum
             end do
-!        end do
+        end do
     end do
 
     call timingend(2)
 
 end subroutine conv2dbin
 
+subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
+    !performs a 2d convolution, assumes filter is binary
+    !res - output matrix
+    !a - input matrix
+    !chOut - number of output channels
+    !chIn - number of input channels
+    !W - width of each channel (num of cols)
+    !H - height of each channel (num of rows)
+    !fil - matrix of filters
+    !fn - number of
+    !stride - stride
+    !thres - thresholds
+    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
+    integer, intent(in) :: thres(chOut)
+    integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
+    integer i, j, l, tempsum, filmult(chIn, fn, fm)
+
+    integer i2, j2, k2
+
+    call timingstarts(2)
+
+    res = res * 0
+
+    do l = 1, chOut
+        do j = 1, H-fn+1, stride
+            do i = 1, W-fm+1, stride
+!                    call elemwisexnor3d(filmult, fil(l, :, :, :), a(:, j:j+fn-1, i:i+fm-1), chIn, fn, fm) !filter * receptive field
+                do i2 = 1, fm
+                    do j2 = 1, fn
+                        do k2 = 1, chIn
+                            if (fil(l, k2, j2, i2) == a(k2, j+j2-1, i+i2-1)) then
+                                filmult(k2, j2, i2) = 1
+                            else
+                                filmult(k2, j2, i2) = 0
+                            end if
+                        end do
+                    end do
+                end do
+!                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+                tempsum = 0
+
+                do i2 = 1, fm
+                    do j2 = 1, fn
+                        do k2 = 1, chIn
+                            tempsum = tempsum + filmult(k2, j2, i2)
+                        end do
+                    end do
+                end do
+
+!                   call  threshold layer
+                if (tempsum < thres(l)) then
+                    res(l, (j-1)/stride+1, (i-1)/stride+1) = 0
+                else
+                    res(l, (j-1)/stride+1, (i-1)/stride+1) = 1
+                end if
+!                    res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum
+            end do
+        end do
+    end do
+
+    call timingend(2)
+
+end subroutine conv2dbinT
+
+subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
+    !performs a 2d convolution
+    !res - output matrix
+    !a - input matrix
+    !chOut - number of output channels
+    !chIn - number of input channels
+    !W - width of each channel (num of cols)
+    !H - height of each channel (num of rows)
+    !bias - vector of biases for each output channel
+    !fil - matrix of filters
+    !fn - number of
+    !stride - stride
+    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
+    integer, intent(in) :: thres(chOut)
+    integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
+    integer i, j, l, tempsum, filmult(chIn, fn, fm), b(chIn, fn, fm)
+    integer i2, j2, k2
+    call timingstarts(1)
+
+    res = res * 0
+
+    do l = 1, chOut
+        do j = 1, H-fn+1, stride
+            do i = 1, W-fm+1, stride
+                b = 2 * fil(l, :, :, :) - 1 ! in order to get values to be -1 or +1 from 0 and 1
+                filmult = b * a(:, j:j+fn-1, i:i+fm-1)
+!                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+                tempsum = 0
+
+                do i2 = 1, fm
+                    do j2 = 1, fn
+                        do k2 = 1, chIn
+                            tempsum = tempsum + filmult(k2, j2, i2)
+                        end do
+                    end do
+                end do
+                !                   call  threshold layer
+                if (tempsum < thres(l)) then
+                    res(l, (j-1)/stride+1, (i-1)/stride+1) = 0
+                else
+                    res(l, (j-1)/stride+1, (i-1)/stride+1) = 1
+                end if
+!                    res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum + bias
+            end do
+        end do
+    end do
+
+    call timingend(1)
+
+end subroutine CNVconvT
 !#####convenience functions
 
 subroutine CNVconv(res, a, chOut, chIn, W, H, fil, fn, fm, stride)
@@ -288,7 +422,7 @@ subroutine CNVconv(res, a, chOut, chIn, W, H, fil, fn, fm, stride)
     integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer i, j, l, tempsum, filmult(chIn, fn, fm), b(chIn, fn, fm)
-
+    integer i2, j2, k2
     call timingstarts(1)
 
     res = res * 0
@@ -299,7 +433,16 @@ subroutine CNVconv(res, a, chOut, chIn, W, H, fil, fn, fm, stride)
                 do i = 1, W-fm+1, stride
                     b = 2 * fil(l, :, :, :) - 1 ! in order to get values to be -1 or +1 from 0 and 1
                     filmult = b * a(:, j:j+fn-1, i:i+fm-1)
-                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+!                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+                    tempsum = 0
+
+                    do i2 = 1, fm
+                        do j2 = 1, fn
+                            do k2 = 1, chIn
+                                tempsum = tempsum + filmult(k2, j2, i2)
+                            end do
+                        end do
+                    end do
                     res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum + bias
                 end do
             end do

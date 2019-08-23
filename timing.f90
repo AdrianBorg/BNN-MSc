@@ -23,7 +23,6 @@ subroutine timing(time, funct)
     counts(funct) = counts(funct) + 1
     avtimings(funct) = (avtimings(funct) * (counts(funct) -1) + time)/counts(funct)
 
-
 end subroutine timing
 
 subroutine timingresults()
