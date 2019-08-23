@@ -2,6 +2,7 @@ program run
     implicit none
 
     integer, parameter :: pics2run = 10000
+
     !testing batch variables
     integer, parameter :: npics = 10000, dims = 32, colours = 3
     integer imgs(npics, colours, dims, dims)
@@ -18,7 +19,7 @@ program run
 
     integer result, stats(0:9), i, correct
 
-!    call runtests()
+    ! call runtests()
 
     !begin program
     print *, '--------------------'

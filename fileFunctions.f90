@@ -1,18 +1,3 @@
-subroutine testfileloading()
-    integer, parameter :: f = 3, in = 3, out = 64
-    character*20, parameter :: filename = 'params/weightsLayer0'
-    integer i, iostatus
-    integer(1) j
-
-    open(unit=10, file=filename, access='stream', status='old')
-
-    do i = 1, f*f
-        read(10, IOSTAT=iostatus) j
-        !print *, iostatus, j
-    end do
-
-end subroutine testfileloading
-
 subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t5, t6, t7, t8)
     integer, parameter :: f = 3
     !integer, parameter :: chOut(0:9) = [3, 64, 64, 128, 128, 256, 256, 512, 512, 10]

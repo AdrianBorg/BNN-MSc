@@ -1,4 +1,9 @@
-gfortran -c fileFunctions.f90
-gfortran -c layerFunctions.f90
-gfortran -c matrixFunctions.f90
-gfortran testfunctions.f90 fileFunctions.f90 layerFunctions.f90 matrixFunctions.f90 -o tests.exe
+gfortran -c -mcmodel=medium timing.f90
+gfortran -c -mcmodel=medium fileFunctions.f90
+gfortran -c -mcmodel=medium layerFunctions.f90
+gfortran -c -mcmodel=medium matrixFunctions.f90
+gfortran -c -mcmodel=medium CNV.f90
+gfortran -c -mcmodel=medium MiscFiles\MiscMatrixFunctions.f90
+gfortran -c -mcmodel=medium MiscFiles\MiscLayerFunctions.f90
+gfortran -c -mcmodel=medium testfunctions.f90
+gfortran -mcmodel=medium test.f90 fileFunctions.f90 layerFunctions.f90 matrixFunctions.f90 timing.f90 testfunctions.f90 MiscFiles\MiscMatrixFunctions.f90 MiscFiles\MiscLayerFunctions.f90 -o test.exe
