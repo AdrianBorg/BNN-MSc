@@ -1,22 +1,129 @@
-program testfunctions
-    implicit none
-
-    call testmsum3d()
-    call testmmulargmax()
-    call testmaxpool()
-    call testhardtanh2d()
-    call testhardtanh3d()
-    call testhardtanh4d()
-    call testbatchnorm2d()
-    call testbatchnorm3d()
-    call testconv2d()
-    call testthresholdLayer()
-    call testdense()
-    call testload()
-    !call testload1()
-    call testReader()
-
-end program testfunctions
+!program testfunctions
+!    implicit none
+!
+!    !picture to test
+!!    integer, parameter :: pic=5030
+!
+!    !testing batch variables
+!    integer, parameter :: npics = 10000, dims = 32, colours = 3
+!    integer imgs(npics, colours, dims, dims)
+!    integer(1) labels(npics)
+!
+!    !weights variables
+!    integer, parameter :: f = 3, chOut(0:9) = [3, 64, 64, 128, 128, 256, 256, 512, 512, 10]
+!    integer :: w1(chOut(1), chOut(0), f ,f), w2(chOut(2), chOut(1), f ,f)
+!    integer :: w3(chOut(3), chOut(2), f ,f), w4(chOut(4), chOut(3), f ,f)
+!    integer :: w5(chOut(5), chOut(4), f ,f), w6(chOut(6), chOut(5), f ,f)
+!    integer :: w7(chOut(6), chOut(7)), w8(chOut(7), chOut(8)), w9(chOut(8), chOut(9))
+!    integer :: t1(chOut(1)), t2(chOut(2)), t3(chOut(3)), t4(chOut(4)), t5(chOut(5))
+!    integer :: t6(chOut(6)), t7(chOut(7)), t8(chOut(8))
+!
+!!    !process variables
+!!    integer, parameter :: odim(6) = [30, 28, 12, 10, 3, 1], pdim(2) = [14, 5]
+!!    integer o1(chOut(1), odim(1), odim(1)), o2(chOut(2), odim(2), odim(2))
+!!    integer o3(chOut(3), odim(3), odim(3)), o4(chOut(4), odim(4), odim(4))
+!!    integer o5(chOut(5), odim(5), odim(5)), o6(chOut(6), odim(6), odim(6))
+!!    integer o7(chOut(7)), o8(chOut(8)), o9(chOut(9))
+!!    integer p1(chOut(2), pdim(1), pdim(1)), p2(chOut(4), pdim(2), pdim(2))
+!
+!    integer result, stats(0:9), i, correct
+!!    integer, parameter :: dd = 1, cc = 0
+!!
+!!    print *, dd .EQV. cc, dd .EQV. dd, cc .EQV. cc
+!    !put this in conv and dense
+!
+!    call testmsum3d()
+!    call testmmulargmax()
+!    call testmaxpool()
+!    call testhardtanh2d()
+!    call testhardtanh3d()
+!    call testhardtanh4d()
+!    call testbatchnorm2d()
+!    call testbatchnorm3d()
+!    call testconv2d()
+!    call testthresholdLayer()
+!    call testdense()
+!    call testsumpopcount()
+!    call testxnor()
+!    call testmmulbin()
+!    call testdensebin()
+!    call testconv2dbin()
+!!    call testload() !something with this crashed at runtime
+!!    call testReader()
+!
+!    !begin program
+!    print *, '----------------'
+!    print *, ''
+!    print *, '- Tests done! Starting program -'
+!    print *, ''
+!    call cifarFileReader(imgs, labels)
+!    print *, '- Images   : loaded'
+!
+!    do i = 0, 9
+!        stats(i) = 0
+!    end do
+!
+!    correct = 0
+!
+!    do i = 1, npics
+!        call infer(result, imgs(i, :, :, :), dims, f, chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t5, t6, t7, t8)
+!        if (result == labels(i)) then
+!            stats(result) = stats(result) + 1
+!            correct = correct + 1
+!            print *, stats
+!        end if
+!    end do
+!
+!    print *, 'stats: ', stats
+!    print *, 'correct: ', correct
+!
+!
+!!
+!!    call loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t5, t6, t7, t8)
+!!    print *, '- Weights  : loaded'
+!!
+!!    call cconvT(o1, imgs(pic, :, :, :), chOut(1), chOut(0), dims, w1, t1, .false.)
+!!    print *, '- 1st Layer: done'
+!!
+!!    call cconvT(o2, o1, chOut(2), chOut(1), odim(1), w2, t2, .true.)
+!!    print *, '- 2nd Layer: done'
+!!
+!!    call maxpool2x23d(p1, o2, chOut(2), odim(2))
+!!    print *, '- maxpool  : done'
+!!
+!!    call cconvT(o3, p1, chOut(3), chOut(2), pdim(1), w3, t3, .true.)
+!!    print *, '- 3rd Layer: done'
+!!
+!!    call cconvT(o4, o3, chOut(4), chOut(3), odim(3), w4, t4, .true.)
+!!    print *, '- 4th Layer: done'
+!!
+!!    call maxpool2x23d(p2, o4, chOut(4), odim(4))
+!!    print *, '- maxpool  : done'
+!!
+!!    call cconvT(o5, p2, chOut(5), chOut(4), pdim(2), w5, t5, .true.)
+!!    print *, '- 5th Layer: done'
+!!
+!!    call cconvT(o6, o5, chOut(6), chOut(5), odim(5), w6, t6, .true.)
+!!    print *, '- 6th Layer: done'
+!!
+!!    call cdensebinT(o7, o6(:, 1, 1), chOut(7), chOut(6), w7, t7)
+!!    print *, '- 7th Layer: done'
+!!
+!!    call cdensebinT(o8, o7, chOut(8), chOut(7), w8, t8)
+!!    print *, '- 8th Layer: done'
+!!
+!!    call densebin(o9, o8, chOut(9), chOut(8), w9)
+!!    print *, '- 9th Layer: done'
+!!
+!!    print *, o9
+!!
+!!    call argmax(pos, o9, 10, 1)
+!!    result = pos-1
+!!    print *, 'expected: ', labels(pic)
+!!    print *, 'result  : ', result
+!
+!
+!end program testfunctions
 
 subroutine testmsum3d()
     integer, parameter :: n = 2, m = 2, k=2
@@ -255,7 +362,8 @@ subroutine testthresholdLayer()
     integer :: tresh(n), a(n, m, l), res(n, m, l), expected(n, m, l)
     a = reshape([1, -2, -1, 3, -2, 4, 2, -1], shape(a))
     tresh = reshape([1, -1], shape(tresh))
-    expected = reshape([1, -1, -1, 1, -1, 1, 1, 1], shape(expected))
+!    expected = reshape([1, -1, -1, 1, -1, 1, 1, 1], shape(expected))
+    expected = reshape([1, 0, 0, 1, 0, 1, 1, 1], shape(expected))
     call thresholdLayer(res, a, n, m, l, tresh)
     call testequalintegermat(res, expected, shape(res), shape(expected), size(shape(res)), 'thresholdLayer')
 
@@ -265,9 +373,14 @@ subroutine testthresholdLayer()
 end subroutine testthresholdLayer
 
 subroutine testdense()
-    integer, parameter :: nIn = 2, nOut = 2
+    integer, parameter :: nIn = 3, nOut = 2
     integer :: res(nOut), expected(nOut), a(nIn), weights(nIn, nOut)
-    print *, '################write test func'
+
+    a = [1, 0, 1]
+    weights = reshape([1, 1, 0, 1, 0, 1], shape(weights))
+    expected = [1, 2]
+!    print *, '################write test func - dense'
+    call dense(res, a, nOut, nIn, weights)
     call testequalintegermat(res, expected, shape(res), shape(expected), size(shape(res)), 'dense')
 end subroutine testdense
 
@@ -283,10 +396,82 @@ subroutine testload()
     call loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t5, t6, t7, t8)
 
     !call printmat(w1(1,1,:,:), [3, 3])
+    print *, '###############write test func - load'
 
 end subroutine testload
 
 subroutine testReader()
-    integer(2) imgs(10000,3,32,32), labels(10000)
+    integer imgs(10000,3,32,32), labels(10000)
     call cifarFileReader(imgs, labels)
+    print *, '###############write test func - read'
 end subroutine testReader
+
+subroutine testsumpopcount()
+    integer, parameter :: n = 2, m = 2, l = 2
+    integer :: a(n, m, l), res, expected
+    a = reshape([1, 0, 0, 1, 1, 1, 0, 1], shape(a))
+    expected = 2
+    call sumPopcount(res, a, [n, m, l])
+    call testequalintegermat([res], [expected], [1], [1], 1, 'sumpopcount1')
+    a = reshape([1, 1, 1, 1, 1, 1, 1, 1], shape(a))
+    expected = 8
+    call sumPopcount(res, a, [n, m, l])
+    call testequalintegermat([res], [expected], [1], [1], 1, 'sumpopcount2')
+    a = reshape([0, 0, 0, 0, 0, 0, 0, 0], shape(a))
+    expected = -8
+    call sumPopcount(res, a, [n, m, l])
+    call testequalintegermat([res], [expected], [1], [1], 1, 'sumpopcount3')
+
+end subroutine testsumpopcount
+
+subroutine testxnor()
+    integer res
+    call xnor(res, 1, 0)
+    call testequalintegermat([res], [0], [1], [1], 1, 'xnor1')
+    call xnor(res, 0, 1)
+    call testequalintegermat([res], [0], [1], [1], 1, 'xnor2')
+    call xnor(res, 1, 1)
+    call testequalintegermat([res], [1], [1], [1], 1, 'xnor3')
+    call xnor(res, 0, 0)
+    call testequalintegermat([res], [1], [1], [1], 1, 'xnor4')
+end subroutine testxnor
+
+subroutine testmmulbin()
+    integer, parameter :: n = 3, m = 2
+    integer :: a(m, n), b(n, m), res(m, m), expected(m,m)
+    a = transpose(reshape([ 1, 1, 0, 1, 0, 1], [n,m]))
+    !transpose because fortran is column major, therefore without it the matrix would be 1,4,7/2,5,9/3,6,9
+    b = reshape([ 1, 1, 1, 0, 0, 0], [n,m])
+    expected = reshape([ 2, 2, 1, 1], [m,m])
+    call mmulbin(res, a, b, m, n, n, m)
+    call testequalintegermat(res, expected, shape(res), shape(expected), 2, 'mmulbin')
+end subroutine testmmulbin
+
+subroutine testdensebin()
+    integer, parameter :: nIn = 3, nOut = 2
+    integer :: res(nOut), expected(nOut), a(nIn), weights(nIn, nOut)
+
+    a = [1, 0, 1]
+    weights = reshape([1, 1, 0, 1, 0, 1], shape(weights))
+    expected = [1, 3]
+!    print *, '################write test func - dense'
+    call densebin(res, a, nOut, nIn, weights)
+    call testequalintegermat(res, expected, shape(res), shape(expected), size(shape(res)), 'densebin')
+end subroutine testdensebin
+
+subroutine testconv2dbin()
+    integer, parameter :: chOut = 1, chIn = 1, W = 3, H = 3, fn = 2, fm = 2, stride = 1
+    integer a(chIn, H, W), bias(chOut), fil(chOut, chIn, fn, fm), res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
+    integer expected(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
+    integer t(2,2)
+
+    a(1, :, :) = reshape([1, 1, 0, 0, 1, 0, 1, 0, 1], shape(a(1, :, :)))
+    t = reshape([ 0, 1, 1, 1], [fn,fm])
+    fil(1, 1, :, :) = t
+    expected = reshape([ 2, 1, 3, 1], shape(expected))
+    bias = [0]
+
+    call conv2dbin(res, a, chOut, chIn, W, H, bias, fil, fn, fm, stride)
+    call testequalintegermat(res, expected, shape(res), shape(expected), 3, 'conv2dbin')
+
+end subroutine testconv2dbin

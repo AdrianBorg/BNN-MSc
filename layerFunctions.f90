@@ -152,8 +152,10 @@ subroutine conv2d(res, a, chOut, chIn, W, H, bias, fil, fn, fm, stride)
 !        do k = 1, chIn
             do j = 1, H-fn+1, stride
                 do i = 1, W-fm+1, stride
-                    filmult = fil(l, :, :, :) * a(:, j:j+fn-1, i:i+fm-1) !filter * receptive field
+!                    call elemMultBin (filmult, fil(l, :, :, :), a(:, j:j+fn-1, i:i+fm-1), chIn, fn, fm) !filter * receptive field
+                    filmult = fil(l, :, :, :) * a(:, j:j+fn-1, i:i+fm-1)
                     call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+!                    call sumPopcount(tempsum, filmult, shape(filmult))
                     res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum + bias(l) !output element value = sum + bias
                 end do
             end do
@@ -174,11 +176,14 @@ subroutine thresholdLayer(res, a, ch, W, H, thres)
     integer, intent(out) :: res(ch, H, W)
     integer i, j, k
 
+    call timingstarts(5)
+
     do k = 1, ch
         do j = 1, H
             do i = 1, W
                 if (a(k, j, i) < thres(k)) then
-                    res(k, j, i) = -1
+!                    res(k, j, i) = -1
+                    res(k, j, i) = 0
                 else
                     res(k, j, i) = 1
                 end if
@@ -187,10 +192,12 @@ subroutine thresholdLayer(res, a, ch, W, H, thres)
         end do
     end do
 
+    call timingend(5)
+
 end subroutine thresholdLayer
 
 subroutine dense(res, a, nOut, nIn, weights)
-    !emulates a full layer
+    !emulates a fullly connected layer
     !res - output matrix
     !a - input matrix
     !nOut - num of outputs
@@ -204,3 +211,175 @@ subroutine dense(res, a, nOut, nIn, weights)
     call mmul(tempOut, tempIn, weights, 1, nIn, nIn, nOut)
     res = tempOut(:, 1)
 end subroutine dense
+
+!binary versions
+
+subroutine densebin(res, a, nOut, nIn, weights)
+    !emulates a fullly connected layer
+    !res - output matrix
+    !a - input matrix
+    !nOut - num of outputs
+    !nIn - num of inputs
+    !weights - weights matrix
+    integer, intent(in) :: nIn, nOut, a(nIn), weights(nIn, nOut)
+    integer, intent(out) :: res(nOut)
+    integer tempIn(1, nIn), tempOut(nOut, 1)
+
+    call timingstarts(4)
+
+    tempIn(1, :) = a(:)
+    call mmulbin(tempOut, tempIn, weights, 1, nIn, nIn, nOut)
+    res = tempOut(:, 1)
+
+    call timingend(4)
+
+end subroutine densebin
+
+subroutine conv2dbin(res, a, chOut, chIn, W, H, fil, fn, fm, stride)
+    !performs a 2d convolution, assumes filter is binary
+    !res - output matrix
+    !a - input matrix
+    !chOut - number of output channels
+    !chIn - number of input channels
+    !W - width of each channel (num of cols)
+    !H - height of each channel (num of rows)
+    !fil - matrix of filters
+    !fn - number of
+    !stride - stride
+    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
+    integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
+    integer i, j, l, tempsum, filmult(chIn, fn, fm)
+
+    call timingstarts(2)
+
+    res = res * 0
+
+    do l = 1, chOut
+!        do k = 1, chIn
+            do j = 1, H-fn+1, stride
+                do i = 1, W-fm+1, stride
+                    call elemwisexnor3d(filmult, fil(l, :, :, :), a(:, j:j+fn-1, i:i+fm-1), chIn, fn, fm) !filter * receptive field
+                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+!                    call sumPopcount(tempsum, filmult, shape(filmult))
+                    res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum
+                end do
+            end do
+!        end do
+    end do
+
+    call timingend(2)
+
+end subroutine conv2dbin
+
+!#####convenience functions
+
+subroutine CNVconv(res, a, chOut, chIn, W, H, fil, fn, fm, stride)
+    !performs a 2d convolution
+    !res - output matrix
+    !a - input matrix
+    !chOut - number of output channels
+    !chIn - number of input channels
+    !W - width of each channel (num of cols)
+    !H - height of each channel (num of rows)
+    !bias - vector of biases for each output channel
+    !fil - matrix of filters
+    !fn - number of
+    !stride - stride
+    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
+    integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
+    integer i, j, l, tempsum, filmult(chIn, fn, fm), b(chIn, fn, fm)
+
+    call timingstarts(1)
+
+    res = res * 0
+
+    do l = 1, chOut
+!        do k = 1, chIn
+            do j = 1, H-fn+1, stride
+                do i = 1, W-fm+1, stride
+                    b = 2 * fil(l, :, :, :) - 1 ! in order to get values to be -1 or +1 from 0 and 1
+                    filmult = b * a(:, j:j+fn-1, i:i+fm-1)
+                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+                    res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum + bias
+                end do
+            end do
+!        end do
+    end do
+
+    call timingend(1)
+
+end subroutine CNVconv
+
+!subroutine conv2dCNV(res, a, chOut, chIn, dims, weights)
+!    !convenience subroutine to call con2v with 3x3 filter, stride = 1 and biases = 0
+!    integer, intent(in) :: chOut, chIn, dims, a(chIn, dims, dims)
+!    integer, intent(in) :: weights(chOut, chIn, dims, dims)
+!    integer, intent(out) :: res(chOut, dims-2, dims-2)
+!
+!    call CNVconv(res, a, chOut, chIn, dims, dims, weights, 3, 3, 1)
+!end subroutine conv2dCNV
+
+!subroutine conv2dbinCNV(res, a, chOut, chIn, dims, weights)
+!    !convenience subroutine to call con2v with 3x3 filter, stride = 1 and biases = 0
+!    integer, intent(in) :: chOut, chIn, dims, a(chIn, dims, dims)
+!    integer, intent(in) :: weights(chOut, chIn, dims, dims)
+!    integer, intent(out) :: res(chOut, dims-2, dims-2)
+!
+!    call conv2dbin(res, a, chOut, chIn, dims, dims, weights, 3, 3, 1)
+!end subroutine conv2dbinCNV
+
+subroutine cconvT(res, a, chOut, chIn, dims, weights, thres, bin)
+    !convenience subroutine to call con2v with 3x3 filter, stride = 1 and biases = 0
+    !and apply threshold layer after
+    integer, intent(in) :: chOut, chIn, dims, a(chIn, dims, dims), thres(chOut)
+    integer, intent(in) :: weights(chOut, chIn, dims, dims)
+    integer, intent(out) :: res(chOut, dims-2, dims-2)
+    integer outConv(chOut, dims-2, dims-2)
+    logical bin
+
+    if (bin) then
+        call conv2dbin(outConv, a, chOut, chIn, dims, dims, weights, 3, 3, 1)
+    else
+        call CNVconv(outConv, a, chOut, chIn, dims, dims, weights, 3, 3, 1)
+    end if
+    call thresholdLayer(res, outConv, chOut, dims-2, dims-2, thres)
+
+end subroutine cconvT
+
+subroutine cdensebinT(res, a, nOut, nIn, weights, thres)
+    !convenience subroutine to call dense and threshold layer
+    !res - output matrix
+    !a - input matrix
+    !nOut - num of outputs
+    !nIn - num of inputs
+    !weights - weights matrix
+    !thres - thresholds for each channel
+    integer, intent(in) :: nIn, nOut, a(nIn), thres(nOut)
+    integer, intent(in) :: weights(nIn, nOut)
+    integer, intent(out) :: res(nOut)
+    integer outDense(nOut)
+
+    call densebin(outDense, a, nOut, nIn, weights)
+    call thresholdLayer(res, outDense, nOut, 1, 1, thres)
+
+end subroutine cdensebinT
+
+subroutine maxpool2x23d(output, input, ch, n)
+    !perform 3d max pool with pool size 2x2
+    !output - output matrix
+    !input - input matrix
+    !ch - num of channels in input
+    !n - num of rows/columns in input
+    integer, intent(in) :: ch, n, input(ch, n, n)
+    integer, intent(out) :: output(ch, n/2, n/2)
+    integer i
+
+    call timingstarts(3)
+
+    do i = 1, ch
+        call maxpool(output(i, :, :), input(i, :, :), [2, 2], n, n)
+    end do
+
+    call timingend(3)
+
+end subroutine maxpool2x23d

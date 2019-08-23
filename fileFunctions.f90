@@ -1,6 +1,6 @@
 subroutine testfileloading()
     integer, parameter :: f = 3, in = 3, out = 64
-    character*13, parameter :: filename = 'weightsLayer0'
+    character*20, parameter :: filename = 'params/weightsLayer0'
     integer i, iostatus
     integer(1) j
 
@@ -17,22 +17,30 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
     integer, parameter :: f = 3
     !integer, parameter :: chOut(0:9) = [3, 64, 64, 128, 128, 256, 256, 512, 512, 10]
     integer, intent(in) :: chOut(0:9)
-    integer(1), intent(out) :: w1(chOut(1), chOut(0), f ,f), w2(chOut(2), chOut(1), f ,f)
-    integer(1), intent(out) :: w3(chOut(3), chOut(2), f ,f), w4(chOut(4), chOut(3), f ,f)
-    integer(1), intent(out) :: w5(chOut(5), chOut(4), f ,f), w6(chOut(6), chOut(5), f ,f)
-    integer(1), intent(out) :: w7(chOut(6), chOut(7)), w8(chOut(7), chOut(8)), w9(chOut(8), chOut(9))
-    integer(4), intent(out) :: t1(chOut(1)), t2(chOut(2)), t3(chOut(3)), t4(chOut(4)), t5(chOut(5))
-    integer(4), intent(out) :: t6(chOut(6)), t7(chOut(7)), t8(chOut(8))
+    integer(1) :: rw1(chOut(1), chOut(0), f ,f), rw2(chOut(2), chOut(1), f ,f)
+    integer(1) :: rw3(chOut(3), chOut(2), f ,f), rw4(chOut(4), chOut(3), f ,f)
+    integer(1) :: rw5(chOut(5), chOut(4), f ,f), rw6(chOut(6), chOut(5), f ,f)
+    integer(1) :: rw7(chOut(6), chOut(7)), rw8(chOut(7), chOut(8)), rw9(chOut(8), chOut(9))
+    integer :: t1(chOut(1)), t2(chOut(2)), t3(chOut(3)), t4(chOut(4)), t5(chOut(5))
+    integer :: t6(chOut(6)), t7(chOut(7)), t8(chOut(8))
+
+    integer, intent(out) :: w1(chOut(1), chOut(0), f ,f), w2(chOut(2), chOut(1), f ,f)
+    integer, intent(out) :: w3(chOut(3), chOut(2), f ,f), w4(chOut(4), chOut(3), f ,f)
+    integer, intent(out) :: w5(chOut(5), chOut(4), f ,f), w6(chOut(6), chOut(5), f ,f)
+    integer, intent(out) :: w7(chOut(6), chOut(7)), w8(chOut(7), chOut(8)), w9(chOut(8), chOut(9))
+
     ! check values in the line above
     integer i, o, k, h, w
-    character*13 filenameW
-    character*12 filenameT
+    character*20 filenameW
+    character*19 filenameT
     character*1 fileNum
+
+
 
     do k = 1, 9
         write(fileNum, '(I1)') k-1
-        filenameW = 'weightsLayer'//fileNum
-        filenameT = 'treshsLayer'//fileNum
+        filenameW = 'params/weightsLayer'//fileNum
+        filenameT = 'params/treshsLayer'//fileNum
         open(unit=10, file=filenameW, access='STREAM', status='old', form='unformatted')
         open(unit=25, file=filenameT, access='STREAM', status='old', form='unformatted')
         do o = 1, chOut(k)
@@ -42,17 +50,23 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
                     do h = 1, f
                         do i = 1, chOut(k-1)
                             if (k==1) then
-                                read(10) w1(o, i, h, w)
+                                read(10) rw1(o, i, h, w)
+                                w1(o, i, h, w) = rw1(o, i, h, w)
                             else if (k==2) then
-                                read(10) w2(o, i, h, w)
+                                read(10) rw2(o, i, h, w)
+                                w2(o, i, h, w) = rw2(o, i, h, w)
                             else if (k==3) then
-                                read(10) w3(o, i, h, w)
+                                read(10) rw3(o, i, h, w)
+                                w3(o, i, h, w) = rw3(o, i, h, w)
                             else if (k==4) then
-                                read(10) w4(o, i, h, w)
+                                read(10) rw4(o, i, h, w)
+                                w4(o, i, h, w) = rw4(o, i, h, w)
                             else if (k==5) then
-                                read(10) w5(o, i, h, w)
+                                read(10) rw5(o, i, h, w)
+                                w5(o, i, h, w) = rw5(o, i, h, w)
                             else if (k==6) then
-                                read(10) w6(o, i, h, w)
+                                read(10) rw6(o, i, h, w)
+                                w6(o, i, h, w) = rw6(o, i, h, w)
                             end if
                         end do
                     end do
@@ -61,11 +75,14 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
             else    !for each full layer
                 do i = 1, chOut(k-1)
                     if (k==7) then
-                        read(10) w7(i, o)
+                        read(10) rw7(i, o)
+                        w7(i, o) = rw7(i, o)
                     else if (k==8) then
-                        read(10) w8(i, o)
+                        read(10) rw8(i, o)
+                        w8(i, o) = rw8(i, o)
                     else if (k==9) then
-                        read(10) w9(i, o)
+                        read(10) rw9(i, o)
+                        w9(i, o) = rw9(i, o)
                     end if
                 end do
             end if
@@ -103,11 +120,11 @@ subroutine cifarFileReader(imgs_unsigned, label)
     ! These are signed bytes, so between -128 and 127
     integer(1) imgs(npics,3,dims,dims)
     ! imgs_unsigned(i,j,k) = imgs(i,j,k) +128
-    integer(2) imgs_unsigned(npics,3,dims,dims)
+    integer imgs_unsigned(npics,3,dims,dims)
 
     label=42 ! should 0-9
 
-    open(unit=42,file="test_batch.bin",access='STREAM', status='old', form='unformatted')
+    open(unit=42,file="imgBins/test_batch.bin",access='STREAM', status='old', form='unformatted')
 
     do nr=1,npics
         read(42) label(nr)
@@ -127,13 +144,12 @@ subroutine cifarFileReader(imgs_unsigned, label)
 
     close(42)
 
-
-    do nr=1,10
-        print *, label(nr)
-        do row=1,32
-            !print *, (imgs((row-1)*32+col,1,nr),col=1,32) ! colour channel 1
-            print *, (imgs_unsigned(nr,3,row,col),col=1,32) ! colour channel 1
-        end do
-    end do
+!    do nr=1,1
+!        print *, label(nr)
+!        do row=1,32
+!            !print *, (imgs((row-1)*32+col,1,nr),col=1,32) ! colour channel 1
+!            print *, (imgs_unsigned(nr,1,row,col),col=1,32) ! colour channel 1
+!        end do
+!    end do
 
 end subroutine cifarFileReader
