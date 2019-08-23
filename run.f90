@@ -18,12 +18,12 @@ program run
 
     integer result, stats(0:9), i, correct
 
-    call runtests()
+!    call runtests()
 
     !begin program
-    print *, '----------------'
+    print *, '--------------------'
     print *, ''
-    print *, '- Tests done! Starting program -'
+    print *, '- Starting program -'
     print *, ''
     call cifarFileReader1(imgs, labels)
     print *, '- Images   : loaded'
@@ -49,6 +49,7 @@ program run
 
     call timingresults()
 
+    print *, '- Results -'
     print '(10X, 10A12)', 'airplane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'
     print '(A10, 10I12)', 'stats: ', stats
     print *, 'correct: ', correct

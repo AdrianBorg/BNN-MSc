@@ -130,6 +130,8 @@
 !end program testfunctions
 
 subroutine runtests()
+    print *, ' - Starting Tests -'
+    print *, ''
     call testmsum3d()
     call testmmulargmax()
     call testmaxpool()
@@ -148,7 +150,9 @@ subroutine runtests()
     call testconv2dbin()
 !    call testload() !something with this crashed at runtime
 !    call testReader()
-
+    print *, ''
+    print *, ' - Tests Done -'
+    print *, ''
 end subroutine runtests
 
 subroutine testmsum3d()

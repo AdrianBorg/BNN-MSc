@@ -13,9 +13,11 @@ F90_SRCS += \
 ../timing.f90 
 
 O_SRCS += \
+../CNV.o \
 ../fileFunctions.o \
 ../layerFunctions.o \
 ../matrixFunctions.o \
+../testfunctions.o \
 ../timing.o 
 
 OBJS += \

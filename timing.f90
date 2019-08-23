@@ -9,10 +9,12 @@ subroutine timing(time, funct)
     !   6 - infer
     !   7 - load images
     !   8 - load weights
+    !   9 - elemwise xnor
+    !  10 - msum3d
     real time
     integer funct
 
-    integer, parameter :: n = 8
+    integer, parameter :: n = 10
     real avtimings(n)
     integer counts(n)
 
@@ -25,22 +27,24 @@ subroutine timing(time, funct)
 end subroutine timing
 
 subroutine timingresults()
-    integer, parameter :: n = 8
+    integer, parameter :: n = 10
     real avtimings(n)
     integer counts(n)
 
     common /ts/ avtimings, counts
     print *, ''
     print *, '- Timings -'
-    print '(10X, 8A12)', 'CNVconv', 'conv2dbin', 'maxpool', 'densebin', 'thresh Lay', 'infer', 'ld imgs', 'ld wts'
-    print '(A10, 8ES12.2)', 'Averages: ', avtimings
-    print '(A10, 8I12)', 'Counts  : ', counts
+    print '(10X, 10A12)', 'CNVconv', 'conv2dbin', 'maxpool',&
+                          'densebin', 'thresh Lay', 'infer',&
+                          'ld imgs', 'ld wts', 'el xnor', 'msum'
+    print '(A10, 10ES12.2)', 'Averages: ', avtimings
+    print '(A10, 10I12)', 'Counts  : ', counts
     print *, ''
 
 end subroutine timingresults
 
 subroutine timingstarts(funct)
-    integer, parameter :: n = 8
+    integer, parameter :: n = 10
     real timstart(n), timend(n)
     integer funct
     logical started(n)
@@ -56,7 +60,7 @@ subroutine timingstarts(funct)
 end subroutine timingstarts
 
 subroutine timingend(funct)
-    integer, parameter :: n = 8
+    integer, parameter :: n = 10
     real timstart(n), timend(n)
     integer funct
     logical started(n)
@@ -69,5 +73,5 @@ subroutine timingend(funct)
 
     started(funct) = .false.
     call cpu_time(timend(funct))
-    call timing(timstart(funct)-timend(funct), funct)
+    call timing(timend(funct)-timstart(funct), funct)
 end subroutine timingend

@@ -7,6 +7,7 @@ subroutine msum3d(res, a, s)
     integer, intent(out) :: res
     integer i, j, k
 
+    call timingstarts(10)
     res = 0
 
     do k = 1, s(3)
@@ -16,6 +17,7 @@ subroutine msum3d(res, a, s)
             end do
         end do
     end do
+    call timingend(10)
 end subroutine msum3d
 
 subroutine mmul(res, a, b, an, am, bn, bm)
@@ -341,6 +343,7 @@ subroutine elemwisexnor3d(res, a, b, l, n, m)
     integer, intent(out) :: res(l, n, m)
     integer i, j, k
 
+    call timingstarts(9)
     do k = 1, l
         do j = 1, n
             do i = 1, m
@@ -348,6 +351,7 @@ subroutine elemwisexnor3d(res, a, b, l, n, m)
             end do
         end do
     end do
+    call timingend(9)
 end subroutine elemwisexnor3d
 
 subroutine mmulbin(res, a, b, an, am, bn, bm)
