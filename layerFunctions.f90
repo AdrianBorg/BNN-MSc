@@ -1,6 +1,6 @@
 subroutine maxpool(output, input, ps, n, m)
     implicit none
-    !ps (poolsize) parameters must perfectly divide the relevant n or m
+    !NOTE ps (poolsize) parameters must perfectly divide the relevant n or m
     !output - output matrix
     !input - input matrix
     !ps - pool size (2D)
@@ -10,12 +10,13 @@ subroutine maxpool(output, input, ps, n, m)
     integer, intent(out) :: output(n/ps(1), m/ps(2))
     integer row, col, loc(2), t1, t2
 
-    do row = 1, n, ps(1)
+    do row = 1, n, ps(1) !cycle through the array
         do col = 1, m, ps(2)
+            !get the index of the maximum value
             call argmax(loc, input(row:row+ps(1)-1, col:col+ps(2)-1), ps(1), ps(2))
             t1 = row/ps(1) + 1
             t2 = col/ps(2) + 1
-!            print *, loc
+            !save the value in the output array
             output(t1, t2) = input(row+loc(1)-1, col+loc(2)-1)
         end do
     end do
@@ -23,7 +24,8 @@ subroutine maxpool(output, input, ps, n, m)
 end subroutine maxpool
 
 subroutine thresholdLayer(res, a, ch, W, H, thres)
-    !makes the bits be -1 if below the threshold or 1 otherwise
+    !acts in place of a batchnorm layer in a binarized neural network
+    !makes the bits in an array 0 if below the threshold or 1 otherwise
     !res - output matrix
     !a - input matrix
     !ch - number of channels
@@ -36,16 +38,14 @@ subroutine thresholdLayer(res, a, ch, W, H, thres)
 
     call timingstarts(5)
 
-    do k = 1, ch
+    do k = 1, ch !cycle through each channel and index
         do j = 1, H
             do i = 1, W
                 if (a(k, j, i) < thres(k)) then
-!                    res(k, j, i) = -1
                     res(k, j, i) = 0
                 else
                     res(k, j, i) = 1
                 end if
-!                print *, k, j, i, a(k, j, i), thres(k)
             end do
         end do
     end do
@@ -54,10 +54,10 @@ subroutine thresholdLayer(res, a, ch, W, H, thres)
 
 end subroutine thresholdLayer
 
-!binary versions
+!Subroutines for binary versions of neural network layers
 
 subroutine densebin(res, a, nOut, nIn, weights)
-    !emulates a fullly connected layer
+    !emulates a binarized, fully connected layer
     !res - output matrix
     !a - input matrix
     !nOut - num of outputs
@@ -70,6 +70,7 @@ subroutine densebin(res, a, nOut, nIn, weights)
     call timingstarts(4)
 
     tempIn(1, :) = a(:)
+    !perform binarized matrix multiplication of the input with the weights matrix
     call mmulbin(tempOut, tempIn, weights, 1, nIn, nIn, nOut)
     res = tempOut(:, 1)
 
@@ -78,14 +79,14 @@ subroutine densebin(res, a, nOut, nIn, weights)
 end subroutine densebin
 
 subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
-    !performs a 2d convolution, assumes filter is binary
+    !performs a 2d convolution, filter is binary, performs thresholding. Expects input array to be binary values
     !res - output matrix
-    !a - input matrix
+    !a - input matrix (BINARY INPUT)
     !chOut - number of output channels
     !chIn - number of input channels
     !W - width of each channel (num of cols)
     !H - height of each channel (num of rows)
-    !fil - matrix of filters
+    !fil - matrix of filters (BINARY)
     !fn - number of
     !stride - stride
     !thres - thresholds
@@ -93,17 +94,17 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     integer, intent(in) :: thres(chOut)
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer i, j, l, tempsum, filmult(chIn, fn, fm)
-
     integer i2, j2, k2
 
     call timingstarts(2)
 
-    res = res * 0
+    res = res * 0 !initialise result array
 
-    do l = 1, chOut
-        do j = 1, H-fn+1, stride
+    do l = 1, chOut !cycle through each channel
+        do j = 1, H-fn+1, stride !slide the filter over the input
             do i = 1, W-fm+1, stride
-!                    call elemwisexnor3d(filmult, fil(l, :, :, :), a(:, j:j+fn-1, i:i+fm-1), chIn, fn, fm) !filter * receptive field
+
+                !perform an elementwise xnor operation between the filter and receptive field
                 do i2 = 1, fm
                     do j2 = 1, fn
                         do k2 = 1, chIn
@@ -115,7 +116,8 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
                         end do
                     end do
                 end do
-!                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+
+                !sum all values from the result of the xnor operation above
                 tempsum = 0
 
                 do i2 = 1, fm
@@ -126,13 +128,12 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
                     end do
                 end do
 
-!                   call  threshold layer
+                !check the result against the threshold value, set as 0 if below or 1 otherwise
                 if (tempsum < thres(l)) then
                     res(l, (j-1)/stride+1, (i-1)/stride+1) = 0
                 else
                     res(l, (j-1)/stride+1, (i-1)/stride+1) = 1
                 end if
-!                    res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum
             end do
         end do
     end do
@@ -142,7 +143,7 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
 end subroutine conv2dbinT
 
 subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
-    !performs a 2d convolution
+    !performs a 2d convolution, filter is binary, performs thresholding
     !res - output matrix
     !a - input matrix
     !chOut - number of output channels
@@ -153,6 +154,7 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     !fil - matrix of filters
     !fn - number of
     !stride - stride
+    !thres - thresholds
     integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
     integer, intent(in) :: thres(chOut)
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
@@ -160,14 +162,16 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     integer i2, j2, k2
     call timingstarts(1)
 
-    res = res * 0
+    res = res * 0 !initialise result array
 
-    do l = 1, chOut
-        do j = 1, H-fn+1, stride
+    do l = 1, chOut !cycle through each channel
+        do j = 1, H-fn+1, stride !slide the filter over the input
             do i = 1, W-fm+1, stride
-                b = 2 * fil(l, :, :, :) - 1 ! in order to get values to be -1 or +1 from 0 and 1
+
+                b = 2 * fil(l, :, :, :) - 1 !convert values to -1 or +1 from 0 and 1
                 filmult = b * a(:, j:j+fn-1, i:i+fm-1)
-!                    call msum3d(tempsum, filmult, shape(filmult)) !sum of resulting matrix
+
+                !sum all values from the result of the elementwaise multiplication operation above
                 tempsum = 0
 
                 do i2 = 1, fm
@@ -177,13 +181,13 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
                         end do
                     end do
                 end do
-                !                   call  threshold layer
+
+                !check the result against the threshold value, set as 0 if below or 1 otherwise
                 if (tempsum < thres(l)) then
                     res(l, (j-1)/stride+1, (i-1)/stride+1) = 0
                 else
                     res(l, (j-1)/stride+1, (i-1)/stride+1) = 1
                 end if
-!                    res(l, (j-1)/stride+1, (i-1)/stride+1) = tempsum !output element value = sum + bias
             end do
         end do
     end do
@@ -191,7 +195,9 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     call timingend(1)
 
 end subroutine CNVconvT
-!#####convenience functions
+
+
+!convenience functions
 
 subroutine maxpool2x23d(output, input, ch, n)
     !perform 3d max pool with pool size 2x2

@@ -99,25 +99,33 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
 end subroutine loadData
 
 subroutine cifarFileReader1(imgs_unsigned, label)
+    !method to read images from the cifar10 dataset
+    !imgs_unsigned - array of images read, with pixel colour values form 0 to 255
+    !              - images are of 32x32 size with 3 colour channels
+    !label - array of labels for each image, corresponding to what their classification should be
+
+    !NOTE - modify the "file" property below to change the file to read the images from
+
     integer, parameter :: npics = 10000, dims = 32
-    integer(1) label(npics) !, zero2, dtype, ndims
-    integer nr, py, px, colour!, row, col
+    integer(1) label(npics)
+    integer nr, py, px, colour
     ! These are signed bytes, so between -128 and 127
     integer(1) imgs(npics,3,dims,dims)
     ! imgs_unsigned(i,j,k) = imgs(i,j,k) +128
     integer imgs_unsigned(npics,3,dims,dims)
 
-!    label=42 ! should 0-9
     call timingstarts(7)
+
+    !modify "file" argument here to switch the file being read
     open(unit=42,file="imgBins/test_batch.bin",access='STREAM', status='old', form='unformatted')
 
-    do nr=1,npics
+    do nr=1,npics !for each image
         read(42) label(nr)
-        do colour=1,3
+        do colour=1,3 !for each channel cycle thorugh each pixel
             do py=1,dims
                 do px=1,dims
-                    read(42) imgs(nr,colour,py,px)
-                    if (imgs(nr,colour,py,px) < 0) then
+                    read(42) imgs(nr,colour,py,px) !read the pixel value
+                    if (imgs(nr,colour,py,px) < 0) then !pixels are read as 2s complement, so convert to unsigned
                         imgs_unsigned(nr,colour,py,px) = imgs(nr,colour,py,px) + 256
                     else
                         imgs_unsigned(nr,colour,py,px) = imgs(nr,colour,py,px)
@@ -129,12 +137,5 @@ subroutine cifarFileReader1(imgs_unsigned, label)
 
     close(42)
     call timingend(7)
-!    do nr=1,1
-!        print *, label(nr)
-!        do row=1,32
-!            !print *, (imgs((row-1)*32+col,1,nr),col=1,32) ! colour channel 1
-!            print *, (imgs_unsigned(nr,1,row,col),col=1,32) ! colour channel 1
-!        end do
-!    end do
 
 end subroutine cifarFileReader1
