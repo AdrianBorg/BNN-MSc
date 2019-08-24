@@ -17,9 +17,10 @@ subroutine infer(result, img, dims, f, chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9
 
     !weights variables
     integer :: f, chOut(0:9)
-    integer :: w1(chOut(1), chOut(0), f ,f), w2(chOut(2), chOut(1), f ,f)
-    integer :: w3(chOut(3), chOut(2), f ,f), w4(chOut(4), chOut(3), f ,f)
-    integer :: w5(chOut(5), chOut(4), f ,f), w6(chOut(6), chOut(5), f ,f)
+    integer :: w1(chOut(0), f ,f, chOut(1)), w2(chOut(1), f ,f, chOut(2))
+    integer :: w3(chOut(2), f ,f, chOut(3)), w4(chOut(3), f ,f, chOut(4))
+    integer :: w5(chOut(4), f ,f, chOut(5)), w6(chOut(5), f ,f, chOut(6))
+
     integer :: w7(chOut(6), chOut(7)), w8(chOut(7), chOut(8)), w9(chOut(8), chOut(9))
     integer :: t1(chOut(1)), t2(chOut(2)), t3(chOut(3)), t4(chOut(4)), t5(chOut(5))
     integer :: t6(chOut(6)), t7(chOut(7)), t8(chOut(8))

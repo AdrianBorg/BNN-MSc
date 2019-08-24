@@ -90,7 +90,7 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     !fn - number of
     !stride - stride
     !thres - thresholds
-    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
+    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chIn, fn, fm, chOut), stride
     integer, intent(in) :: thres(chOut)
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer i, j, l, tempsum, filmult(chIn, fn, fm)
@@ -108,7 +108,8 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
                 do i2 = 1, fm
                     do j2 = 1, fn
                         do k2 = 1, chIn
-                            if (fil(l, k2, j2, i2) == a(k2, j+j2-1, i+i2-1)) then
+                            if (fil(k2, j2, i2, l) == a(k2, j+j2-1, i+i2-1)) then
+
                                 filmult(k2, j2, i2) = 1
                             else
                                 filmult(k2, j2, i2) = 0
@@ -155,7 +156,7 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     !fn - number of
     !stride - stride
     !thres - thresholds
-    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chOut, chIn, fn, fm), stride
+    integer, intent(in) :: chOut, chIn, W, H, a(chIn, H, W), fn, fm, fil(chIn, fn, fm, chOut), stride
     integer, intent(in) :: thres(chOut)
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer i, j, l, tempsum, filmult(chIn, fn, fm), b(chIn, fn, fm)
@@ -168,7 +169,8 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
         do j = 1, H-fn+1, stride !slide the filter over the input
             do i = 1, W-fm+1, stride
 
-                b = 2 * fil(l, :, :, :) - 1 !convert values to -1 or +1 from 0 and 1
+                b = 2 * fil(:, :, :, l) - 1 !convert values to -1 or +1 from 0 and 1
+
                 filmult = b * a(:, j:j+fn-1, i:i+fm-1)
 
                 !sum all values from the result of the elementwaise multiplication operation above
@@ -195,7 +197,6 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     call timingend(1)
 
 end subroutine CNVconvT
-
 
 !convenience functions
 
