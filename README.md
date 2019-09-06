@@ -33,7 +33,7 @@ The files have been split up into several files and folders, the most important 
  - params: contains the files from which the parameters of the CNV network are read
  - imgBins: contains the binary file of the test images used during testing
  - miscfiles: contains files which were developed but not used, could be useful for creating new networks
+ - python: contains the modified python code from https://github.com/Xilinx/BNN-PYNQ used to create parameter files
  
  ### Eclipse
  The .cproject, .project files and the Debug folder are a result of using eclipse and photran, they have been included in case it is convenient
- 
