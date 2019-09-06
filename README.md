@@ -17,7 +17,7 @@ In order to run the system while timing the timed subroutines, the flag -DDO_TIM
 ## File System
 The files have been split up into several files and folders, the most important ones are mentioned below:
 
-###Fortran files
+### Fortran files
  - run: the main file which runs the test script
  - matrixFunctionc: contains subroutines related to matrix manipulation and matrix data
  - layerFunctions: contains subroutines related to the neural network layers required for the CNV network
