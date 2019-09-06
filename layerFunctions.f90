@@ -35,9 +35,9 @@ subroutine thresholdLayer(res, a, ch, W, H, thres)
     integer, intent(in) ::  ch, W, H, thres(ch), a(ch, H, W)
     integer, intent(out) :: res(ch, H, W)
     integer i, j, k
-
+#ifdef DO_TIMING
     call timingstarts(5)
-
+#endif
     do k = 1, ch !cycle through each channel and index
         do j = 1, H
             do i = 1, W
@@ -49,9 +49,9 @@ subroutine thresholdLayer(res, a, ch, W, H, thres)
             end do
         end do
     end do
-
+#ifdef DO_TIMING
     call timingend(5)
-
+#endif
 end subroutine thresholdLayer
 
 !Subroutines for binary versions of neural network layers
@@ -66,16 +66,16 @@ subroutine densebin(res, a, nOut, nIn, weights)
     integer, intent(in) :: nIn, nOut, a(nIn), weights(nIn, nOut)
     integer, intent(out) :: res(nOut)
     integer tempIn(1, nIn), tempOut(nOut, 1)
-
+#ifdef DO_TIMING
     call timingstarts(4)
-
+#endif
     tempIn(1, :) = a(:)
     !perform binarized matrix multiplication of the input with the weights matrix
     call mmulbin(tempOut, tempIn, weights, 1, nIn, nIn, nOut)
     res = tempOut(:, 1)
-
+#ifdef DO_TIMING
     call timingend(4)
-
+#endif
 end subroutine densebin
 
 subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
@@ -95,9 +95,9 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer i, j, l, tempsum, filmult(chIn, fn, fm)
     integer i2, j2, k2
-
+#ifdef DO_TIMING
     call timingstarts(2)
-
+#endif
     res = res * 0 !initialise result array
 
     do l = 1, chOut !cycle through each channel
@@ -138,9 +138,9 @@ subroutine conv2dbinT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
             end do
         end do
     end do
-
+#ifdef DO_TIMING
     call timingend(2)
-
+#endif
 end subroutine conv2dbinT
 
 subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
@@ -161,8 +161,9 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
     integer, intent(out) :: res(chOut, (H-fn)/stride+1, (W-fm)/stride+1)
     integer i, j, l, tempsum, filmult(chIn, fn, fm), b(chIn, fn, fm)
     integer i2, j2, k2
+#ifdef DO_TIMING
     call timingstarts(1)
-
+#endif
     res = res * 0 !initialise result array
 
     do l = 1, chOut !cycle through each channel
@@ -193,9 +194,9 @@ subroutine CNVconvT(res, a, chOut, chIn, W, H, fil, fn, fm, stride, thres)
             end do
         end do
     end do
-
+#ifdef DO_TIMING
     call timingend(1)
-
+#endif
 end subroutine CNVconvT
 
 !convenience functions
@@ -209,13 +210,13 @@ subroutine maxpool2x23d(output, input, ch, n)
     integer, intent(in) :: ch, n, input(ch, n, n)
     integer, intent(out) :: output(ch, n/2, n/2)
     integer i
-
+#ifdef DO_TIMING
     call timingstarts(3)
-
+#endif
     do i = 1, ch
         call maxpool(output(i, :, :), input(i, :, :), [2, 2], n, n)
     end do
-
+#ifdef DO_TIMING
     call timingend(3)
-
+#endif
 end subroutine maxpool2x23d

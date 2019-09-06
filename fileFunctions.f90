@@ -20,8 +20,10 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
     character*19 filenameT
     character*1 fileNum
 
-
+#ifdef DO_TIMING
     call timingstarts(8)
+#endif
+
     do k = 1, 9
         write(fileNum, '(I1)') k-1
         filenameW = 'params/weightsLayer'//fileNum
@@ -94,7 +96,9 @@ subroutine loadData(chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9, t1, t2, t3, t4, t
         close(10)
         close(25)
     end do
+#ifdef DO_TIMING
     call timingend(8)
+#endif
 end subroutine loadData
 
 subroutine cifarFileReader1(imgs_unsigned, label)
@@ -113,7 +117,9 @@ subroutine cifarFileReader1(imgs_unsigned, label)
     ! imgs_unsigned(i,j,k) = imgs(i,j,k) +128
     integer imgs_unsigned(npics,3,dims,dims)
 
+#ifdef DO_TIMING
     call timingstarts(7)
+#endif
 
     !modify "file" argument here to switch the file being read
     open(unit=42,file="imgBins/test_batch.bin",access='STREAM', status='old', form='unformatted')
@@ -135,6 +141,9 @@ subroutine cifarFileReader1(imgs_unsigned, label)
     end do
 
     close(42)
+
+#ifdef DO_TIMING
     call timingend(7)
+#endif
 
 end subroutine cifarFileReader1

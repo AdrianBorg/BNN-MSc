@@ -33,9 +33,9 @@ subroutine infer(result, img, dims, f, chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9
     integer o7(chOut(7)), o8(chOut(8)), o9(chOut(9))
     integer r7(chOut(7)), r8(chOut(8))
     integer p1(chOut(2), pdim(1), pdim(1)), p2(chOut(4), pdim(2), pdim(2))
-
+#ifdef DO_TIMING
     call timingstarts(6)
-
+#endif
     !begin network
 
     !Conv layers
@@ -60,7 +60,7 @@ subroutine infer(result, img, dims, f, chOut, w1, w2, w3, w4, w5, w6, w7, w8, w9
     !extract result
     call maxpos(pos, o9, 10)
     result = pos-1
-
+#ifdef DO_TIMING
     call timingend(6)
-
+#endif
 end subroutine infer
